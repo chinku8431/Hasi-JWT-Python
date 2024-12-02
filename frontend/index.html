@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Comparison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        h2 {
+            text-align: center;
+        }
+        input[type="file"],
+        button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>File Comparison</h2>
+        <input type="file" id="file1" />
+        <input type="file" id="file2" />
+        <button onclick="compareFiles()">Compare</button>
+        <div id="result" class="result" hidden></div>
+    </div>
+
+    <script>
+        async function compareFiles() {
+            const file1 = document.getElementById("file1").files[0];
+            const file2 = document.getElementById("file2").files[0];
+            const token = "your_jwt_token_here";
+
+            if (!file1 || !file2) {
+                alert("Please select both files");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file1", file1);
+            formData.append("file2", file2);
+
+            const response = await fetch("/compare-files/", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                document.getElementById("result").innerHTML = `
+                    <h4>Differences:</h4>
+                    <pre>${JSON.stringify(result.differences, null, 2)}</pre>
+                `;
+                document.getElementById("result").hidden = false;
+            } else {
+                alert("Error: Unable to compare files");
+            }
+        }
+    </script>
+</body>
+</html>
